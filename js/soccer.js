@@ -80,7 +80,10 @@ function checkProfil() {
 
 function showTopContent(contentId) {
     if(!checkProfil() && contentId != 'profil_content') {
-        alert('Please complete your profil');
+        // alert('Please complete your profil');
+        var toast = new bootstrap.Toast(document.getElementById('myToast'));
+        document.getElementById('toast_body').innerHTML = 'Please complete your profil';
+        toast.show();
         return;
     }
 
@@ -423,7 +426,11 @@ function openModals() {
         }
 
         if(!flag) {
-            alert('Please insert home team player names');
+            // alert('Please insert home team player names');
+            var toast = new bootstrap.Toast(document.getElementById('myToast'));
+        document.getElementById('toast_body').innerHTML = 'Please insert home team player names';
+
+            toast.show();
             return;
         }
     
@@ -453,7 +460,10 @@ function openModals() {
         }
 
         if(!flag) {
-            alert('Please insert away team player names');
+            // alert('Please insert away team player names');
+            var toast = new bootstrap.Toast(document.getElementById('myToast'));
+            document.getElementById('toast_body').innerHTML = 'Please insert away team player names';
+            toast.show();
             return;
         }
 
@@ -478,11 +488,6 @@ function exportPinpointCoordinatesToCSV() {
     const date = document.getElementById('date_input').value;
     const analyzed = document.getElementById('select_team_input').value;
     const sendOfAttack = document.getElementById('select_sense_attack_input').value;
-
-    if(homeTeam === '' && awayTeam === '' && date === '') {
-        alert('Please complete your profil');
-        return;
-    }
 
     for(let i = 0; i < pinPointData.length; i ++) {
         pinPointData[i].home_team = homeTeam;
