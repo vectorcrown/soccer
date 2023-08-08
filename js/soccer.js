@@ -79,12 +79,35 @@ function checkProfil() {
 }
 
 function showTopContent(contentId) {
-    if(!checkProfil() && contentId != 'profil_content') {
+    if(!checkProfil() && contentId !== 'profil_content') {
         // alert('Please complete your profil');
         var toast = new bootstrap.Toast(document.getElementById('myToast'));
         document.getElementById('toast_body').innerHTML = 'Please complete your profil';
         toast.show();
         return;
+    }
+
+    var homeTeamPlayers = document.getElementsByClassName('player_name_input1');
+    var awayTeamPlayers = document.getElementsByClassName('player_name_input2');
+    var playerBtns = document.getElementsByClassName('player-btn');
+    var passerBtns = document.getElementsByClassName('passer-btn');
+    var receiverBtns = document.getElementsByClassName('receiver-btn');
+
+    if(contentId === 'position_pitch_content' || contentId === 'orientation_pitch_content') {
+        // debugger;
+        if(document.getElementById('select_team_input').value === 'home') {
+            for(let i = 0; i < playerBtns.length; i ++) {
+                playerBtns[i].innerHTML = homeTeamPlayers[i].value;
+                passerBtns[i].innerHTML = homeTeamPlayers[i].value;
+                receiverBtns[i].innerHTML = homeTeamPlayers[i].value;
+            }    
+        } else {
+            for(let i = 0; i < playerBtns.length; i ++) {
+                playerBtns[i].innerHTML = awayTeamPlayers[i].value;
+                passerBtns[i].innerHTML = awayTeamPlayers[i].value;
+                receiverBtns[i].innerHTML = awayTeamPlayers[i].value;
+            }    
+        }
     }
 
     var topDivs = document.querySelectorAll('.top-div');
@@ -434,15 +457,15 @@ function openModals() {
             return;
         }
     
-        var playerBtns = document.getElementsByClassName('player-btn');
-        var passerBtns = document.getElementsByClassName('passer-btn');
-        var receiverBtns = document.getElementsByClassName('receiver-btn');
+        // var playerBtns = document.getElementsByClassName('player-btn');
+        // var passerBtns = document.getElementsByClassName('passer-btn');
+        // var receiverBtns = document.getElementsByClassName('receiver-btn');
 
-        for(let i = 0; i < playerBtns.length; i ++) {
-            playerBtns[i].innerHTML = homeTeamPlayers[i].value;
-            passerBtns[i].innerHTML = homeTeamPlayers[i].value;
-            receiverBtns[i].innerHTML = homeTeamPlayers[i].value;
-        }
+        // for(let i = 0; i < playerBtns.length; i ++) {
+        //     playerBtns[i].innerHTML = homeTeamPlayers[i].value;
+        //     passerBtns[i].innerHTML = homeTeamPlayers[i].value;
+        //     receiverBtns[i].innerHTML = homeTeamPlayers[i].value;
+        // }
         
         homeTeamPlayerModal.hide();
     });
@@ -467,15 +490,15 @@ function openModals() {
             return;
         }
 
-        var playerBtns = document.getElementsByClassName('player-btn');
-        var passerBtns = document.getElementsByClassName('passer-btn');
-        var receiverBtns = document.getElementsByClassName('receiver-btn');
+        // var playerBtns = document.getElementsByClassName('player-btn');
+        // var passerBtns = document.getElementsByClassName('passer-btn');
+        // var receiverBtns = document.getElementsByClassName('receiver-btn');
 
-        for(let i = 0; i < playerBtns.length; i ++) {
-            playerBtns[i].innerHTML = awayTeamPlayers[i].value;
-            passerBtns[i].innerHTML = awayTeamPlayers[i].value;
-            receiverBtns[i].innerHTML = awayTeamPlayers[i].value;
-        }
+        // for(let i = 0; i < playerBtns.length; i ++) {
+        //     playerBtns[i].innerHTML = awayTeamPlayers[i].value;
+        //     passerBtns[i].innerHTML = awayTeamPlayers[i].value;
+        //     receiverBtns[i].innerHTML = awayTeamPlayers[i].value;
+        // }
 
         awayTeamPlayerModal.hide();
     });
