@@ -1,16 +1,48 @@
-.pinpoint {
+.pinpoint01 {
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.pinpoint02 {
+    width: 10px;
+    height: 10px;
+    background-color: yellow;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.pinpoint03 {
     width: 10px;
     height: 10px;
     background-color: red;
     border-radius: 50%;
     position: absolute;
-  }
-  
-  /* Google Fonts */
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
-  
-  /* Variables CSS */
-  :root {
+}
+
+.pinpoint1 {
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.pinpoint2 {
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+}
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+
+/* Variables CSS */
+:root {
     /* Colors */
     --hue: 240;
     --first-color: hsl(var(--hue), 16%, 18%);
@@ -19,20 +51,20 @@
     --text-color: hsl(var(--hue), 8%, 35%);
     --body-color: hsl(var(--hue), 100%, 99%);
     --container-color: #FFF;
-  
+
     /* Font and typography */
     --body-font: 'Poppins', sans-serif;
     --big-font-size: 1.5rem;
     --normal-font-size: .938rem;
-  
+
     /* z index */
     --z-modal: 1000;
-  }
-  
-  @media screen and (min-width: 968px) {
+}
+
+@media screen and (min-width: 968px) {
     :root {
-      --big-font-size: 1.75rem;
-      --normal-font-size: 1rem;
+        --big-font-size: 1.75rem;
+        --normal-font-size: 1rem;
     }
 }
 
@@ -103,7 +135,11 @@ body, html {
 }
 
 .input-group {
-    width: 40%;
+    width: 80%;
+}
+
+#home_player_modal_body input {
+    width: 120px;
 }
 
 #position_first_modal_body button {
@@ -129,4 +165,12 @@ body, html {
 #orientation_receiver_modal_body button {
     width: 120px;
     cursor: pointer;
+}
+
+.player_name_input1 {
+    margin-bottom: 5px;
+}
+
+.player_name_input2 {
+    margin-bottom: 5px;
 }

@@ -38,9 +38,52 @@ function initpinPointDataEntry() {
         team_analyzed: 'home',
         sense_of_attack: 'right',
     };
+
+    pinPointDataEntry.home_team = document.getElementById('home_team_input').value;
+    pinPointDataEntry.away_team = document.getElementById('away_team_input').value;
+    pinPointDataEntry.date = document.getElementById('date_input').value;
+    pinPointDataEntry.team_analyzed = document.getElementById('select_team_input').value;
+    pinPointDataEntry.sense_of_attack = document.getElementById('select_sense_attack_input').value;
+}
+
+function checkProfil() {
+    var homeTeam = document.getElementById('home_team_input').value;
+    var awayTeam = document.getElementById('away_team_input').value;
+    var date = document.getElementById('date_input').value.value;
+    var analyzed = document.getElementById('select_team_input').value;
+    var senseOfAttack = document.getElementById('select_sense_attack_input').value;
+    var flag = 1;
+
+    if(homeTeam === '' || awayTeam === '' || date === '') {
+        return 0;
+    }
+
+    var homeTeamPlayers = document.getElementsByClassName('player_name_input1');
+    var awayTeamPlayers = document.getElementsByClassName('player_name_input2');
+
+    for(player of homeTeamPlayers) {
+        if(player.value === '') {
+            flag = 0;
+            break;
+        }
+    }
+
+    for(player of awayTeamPlayers) {
+        if(player.value === '') {
+            flag = 0;
+            break;
+        }
+    }
+
+    return flag;
 }
 
 function showTopContent(contentId) {
+    if(!checkProfil() && contentId != 'profil_content') {
+        alert('Please complete your profil');
+        return;
+    }
+
     var topDivs = document.querySelectorAll('.top-div');
     topDivs.forEach(function(div) {
         div.style.display = 'none';
@@ -82,6 +125,9 @@ function showTopContent(contentId) {
         isExportContentSelected = true;
         isFirstPinPointSelected = false;
     } else {}
+
+    initpinPointDataEntry();
+    pinPointCount = 0;
 }
 
 function scaleCoordinate(value, max) {
@@ -101,8 +147,23 @@ function placePinPointForPosition(event) {
     pinPointDataEntry.y1 = 0;
 }
 
-function placePinPointForOrientation(event) {
+function placePinPointForOrientation(event, orientationFirstModal) {
+    const positioniPitchContent = document.getElementById("orientation_pitch_content");
+    const pitchWidth = positioniPitchContent.clientWidth;
+    const pitchHeight = positioniPitchContent.clientHeight;
+    const x = scaleCoordinate(event.clientX - positioniPitchContent.offsetLeft, pitchWidth);
+    const y = scaleCoordinate(event.clientY - positioniPitchContent.offsetTop, pitchHeight);
 
+    if(isFirstPinPointSelected) {
+        pinPointDataEntry.x1 = x;
+        pinPointDataEntry.y1 = y;
+        orientationFirstModal.show();
+        isFirstPinPointSelected = false;
+    } else {
+        pinPointDataEntry.x = x;
+        pinPointDataEntry.y = y;
+        isFirstPinPointSelected = true;
+    }
 }
 
 function cancelModal() {
@@ -112,6 +173,60 @@ function cancelModal() {
             initpinPointDataEntry();
         });
     }
+}
+
+function addRowToExportTable(pinPointDataEntry) {
+    var exportTable = document.getElementById('export_table');
+    var row = exportTable.insertRow(-1);
+    var cell0 = row.insertCell(0);
+    var cell1 = row.insertCell(1);
+    var cell2 = row.insertCell(2);
+    var cell3 = row.insertCell(3);
+    var cell4 = row.insertCell(4);
+    var cell5 = row.insertCell(5);
+    var cell6 = row.insertCell(6);
+    var cell7 = row.insertCell(7);
+    var cell8 = row.insertCell(8);
+    var cell9 = row.insertCell(9);
+    var cell10 = row.insertCell(10);
+    var cell11 = row.insertCell(11);
+    var cell12 = row.insertCell(12);
+
+    cell0.innerHTML = pinPointDataEntry.x;
+    cell1.innerHTML = pinPointDataEntry.y;
+    cell2.innerHTML = pinPointDataEntry.x1;
+    cell3.innerHTML = pinPointDataEntry.y1;
+    cell4.innerHTML = pinPointDataEntry.label;
+    cell5.innerHTML = pinPointDataEntry.player;
+    cell6.innerHTML = pinPointDataEntry.receiver;
+    cell7.innerHTML = pinPointDataEntry.frame;
+    cell8.innerHTML = pinPointDataEntry.home_team;
+    cell9.innerHTML = pinPointDataEntry.away_team;
+    cell10.innerHTML = pinPointDataEntry.date;
+    cell11.innerHTML = pinPointDataEntry.team_analyzed;
+    cell12.innerHTML = pinPointDataEntry.sense_of_attack;
+}
+
+function drawLine(x, y, x1, y1, type) {
+    var bla = "";
+    var lineLength = Math.sqrt( (x-x1)*(x-x1)+(y-y1)*(y-y1) );
+    var color = 'green';
+
+    if(type === 'success pass') {
+        color = 'orange';
+    } else if(type === 'failed pass') {
+        color = 'red';
+    } else if(type === 'progress') {
+        color = 'blue';
+    } else if(type === 'call') {
+        color = 'yellow';
+    } else {}
+    
+    for( var i = 0; i < lineLength; i ++ )
+    {
+        bla += "<div style='z-index:0; position:absolute; left:"+ Math.round( x + (x1 - x) * i / lineLength ) +"px;top:"+ Math.round( y + ( y1 - y ) * i / lineLength  ) +"px;width:1px;height:1px;background:" + color + "'></div>";
+    }
+    document.getElementById('orientation_pitch_content').innerHTML += bla;
 }
 
 function openModals() {
@@ -124,19 +239,16 @@ function openModals() {
     const orientationFirstModal = new bootstrap.Modal(document.getElementById('orientation-first-modal'));
     const orientationPasserModal = new bootstrap.Modal(document.getElementById('orientation-passer-modal'));
     const orientationReceiverModal = new bootstrap.Modal(document.getElementById('orientation-receiver-modal'));
+    const homeTeamPlayerModal = new bootstrap.Modal(document.getElementById('home_team_player_modal'));
+    const awayTeamPlayerModal = new bootstrap.Modal(document.getElementById('away_team_player_modal'));
     
     positionPitchContent.addEventListener('click', function(event) {
         placePinPointForPosition(event);
         positionFirstModal.show();
     });
 
-    orientationPitchContent.addEventListener('click', function() {
-        if(isFirstPinPointSelected) {
-            orientationFirstModal.show();
-            isFirstPinPointSelected = false;
-        } else {
-            isFirstPinPointSelected = true;
-        }
+    orientationPitchContent.addEventListener('click', function(event) {
+        placePinPointForOrientation(event, orientationFirstModal);
     });
 
     //  position
@@ -171,45 +283,27 @@ function openModals() {
         playerBtn.addEventListener('click', function() {
             positionPlayerModal.hide();
             
-            pinPointDataEntry.player = playerBtn.id;
+            pinPointDataEntry.player = playerBtn.innerHTML;
 
             const pinpoint = document.createElement("div");
-            pinpoint.className = "pinpoint";
+            if(pinPointDataEntry.label === 'recovery') {
+                pinpoint.className = "pinpoint01";
+
+            } else if(pinPointDataEntry.label === 'loss') {
+                pinpoint.className = "pinpoint02";
+                
+            } else if(pinPointDataEntry.label === 'loss(+3 touches)') {
+                pinpoint.className = "pinpoint03";
+            } else {}
+
+            pinpoint.setAttribute('title', `${pinPointDataEntry.player}, ${pinPointDataEntry.label}`);
             pinpoint.style.left = pinPointDataEntry.x * document.getElementById("position_pitch_content").clientWidth / 100 + "px";
             pinpoint.style.top = pinPointDataEntry.y * document.getElementById("position_pitch_content").clientHeight / 100 + "px";
             positionPitchContent.appendChild(pinpoint);
+
             pinPointData.push(pinPointDataEntry);
 
-            var exportTable = document.getElementById('export_table');
-            var row = exportTable.insertRow(-1);
-            var cell0 = row.insertCell(0);
-            var cell1 = row.insertCell(1);
-            var cell2 = row.insertCell(2);
-            var cell3 = row.insertCell(3);
-            var cell4 = row.insertCell(4);
-            var cell5 = row.insertCell(5);
-            var cell6 = row.insertCell(6);
-            var cell7 = row.insertCell(7);
-            var cell8 = row.insertCell(8);
-            var cell9 = row.insertCell(9);
-            var cell10 = row.insertCell(10);
-            var cell11 = row.insertCell(11);
-            var cell12 = row.insertCell(12);
-
-            cell0.innerHTML = pinPointDataEntry.x;
-            cell1.innerHTML = pinPointDataEntry.y;
-            cell2.innerHTML = pinPointDataEntry.x1;
-            cell3.innerHTML = pinPointDataEntry.y1;
-            cell4.innerHTML = pinPointDataEntry.label;
-            cell5.innerHTML = pinPointDataEntry.player;
-            cell6.innerHTML = pinPointDataEntry.receiver;
-            cell7.innerHTML = pinPointDataEntry.frame;
-            cell8.innerHTML = pinPointDataEntry.home_team;
-            cell9.innerHTML = pinPointDataEntry.away_team;
-            cell10.innerHTML = pinPointDataEntry.date;
-            cell11.innerHTML = pinPointDataEntry.team_analyzed;
-            cell12.innerHTML = pinPointDataEntry.sense_of_attack;
-
+            addRowToExportTable(pinPointDataEntry);
             initpinPointDataEntry();
         });
     }
@@ -223,21 +317,29 @@ function openModals() {
     successPassBtn.addEventListener('click', function() {
         orientationFirstModal.hide();
         orientationPasserModal.show();
+
+        pinPointDataEntry.label = 'success pass';
     });
 
     failedPassBtn.addEventListener('click', function() {
         orientationFirstModal.hide();
         orientationPasserModal.show();
+
+        pinPointDataEntry.label = 'failed pass';
     });
 
     progressBtn.addEventListener('click', function() {
         orientationFirstModal.hide();
         orientationPasserModal.show();
+
+        pinPointDataEntry.label = 'progress';
     });
 
     callBtn.addEventListener('click', function() {
         orientationFirstModal.hide();
         orientationPasserModal.show();
+
+        pinPointDataEntry.label = 'call';
     });
 
     const passerBtns = document.getElementsByClassName('passer-btn');
@@ -246,6 +348,8 @@ function openModals() {
         passerBtn.addEventListener('click', function() {
             orientationPasserModal.hide();
             orientationReceiverModal.show();
+
+            pinPointDataEntry.player = passerBtn.innerHTML;
         });
     }
 
@@ -254,13 +358,118 @@ function openModals() {
     for(let receiverBtn of receiverBtns) {
         receiverBtn.addEventListener('click', function() {
             orientationReceiverModal.hide();
-            //
+            
+            pinPointDataEntry.receiver = receiverBtn.innerHTML;
+
+            var posX = pinPointDataEntry.x * document.getElementById("orientation_pitch_content").clientWidth / 100;
+            var posY = pinPointDataEntry.y * document.getElementById("orientation_pitch_content").clientHeight / 100;
+            var posX1 = pinPointDataEntry.x1 * document.getElementById("orientation_pitch_content").clientWidth / 100;
+            var posY1 = pinPointDataEntry.y1 * document.getElementById("orientation_pitch_content").clientHeight / 100;
+
+            const pinpoint1 = document.createElement("div");
+            pinpoint1.className = "pinpoint1";
+            pinpoint1.setAttribute('title', `${pinPointDataEntry.player}, passer, ${pinPointDataEntry.label}`);
+            pinpoint1.style.left = ( posX - 5 ) + "px";
+            pinpoint1.style.top = ( posY - 5 ) + "px";
+            orientationPitchContent.appendChild(pinpoint1);
+
+            const pinpoint2 = document.createElement("div");
+            pinpoint2.className = "pinpoint2";
+            pinpoint2.setAttribute('title', `${pinPointDataEntry.player}, receiver, ${pinPointDataEntry.label}`);
+            pinpoint2.style.left = ( posX1 - 5 ) + "px";
+            pinpoint2.style.top = ( posY1 - 5 ) + "px";
+            orientationPitchContent.appendChild(pinpoint2);
+
+            drawLine(posX, posY, posX1, posY1, pinPointDataEntry.label);
+            pinPointData.push(pinPointDataEntry);
+
+            addRowToExportTable(pinPointDataEntry);
+            initpinPointDataEntry();
         });
     }
-}
 
-function getPinpointCoordinates() {
+    //  open home team modal
+    var openHomeTeamModalBtn = document.getElementById('home_team_player_modal_btn');
+    openHomeTeamModalBtn.addEventListener('click', function() {
+        awayTeamPlayerModal.hide();
+        homeTeamPlayerModal.show();
+    });
+    //  open away team modal
+    var openAwayTeamModalBtn = document.getElementById('away_team_player_modal_btn');
+    openAwayTeamModalBtn.addEventListener('click', function() {
+        homeTeamPlayerModal.hide();
+        awayTeamPlayerModal.show();
+    });
+
+
+    var awayTeamPlayers = document.getElementsByClassName('player_name_input2');
+    for(player of awayTeamPlayers) {
+        if(player.value === '') {
+            flag = 0;
+            break;
+        }
+    }
+
+    //  save home team player names
+    document.getElementById('close_home_team_player_modal_btn').addEventListener('click', function() {
+        var homeTeamPlayers = document.getElementsByClassName('player_name_input1');
+        var flag = 1;
+
+        for(player of homeTeamPlayers) {
+            if(player.value === '') {
+                flag = 0;
+                break;
+            }
+        }
+
+        if(!flag) {
+            alert('Please insert home team player names');
+            return;
+        }
     
+        var playerBtns = document.getElementsByClassName('player-btn');
+        var passerBtns = document.getElementsByClassName('passer-btn');
+        var receiverBtns = document.getElementsByClassName('receiver-btn');
+
+        for(let i = 0; i < playerBtns.length; i ++) {
+            playerBtns[i].innerHTML = homeTeamPlayers[i].value;
+            passerBtns[i].innerHTML = homeTeamPlayers[i].value;
+            receiverBtns[i].innerHTML = homeTeamPlayers[i].value;
+        }
+        
+        homeTeamPlayerModal.hide();
+    });
+
+    //  save away team player names
+    document.getElementById('close_away_team_player_modal_btn').addEventListener('click', function() {
+        var awayTeamPlayers = document.getElementsByClassName('player_name_input2');
+        var flag = 1;
+
+        for(player of awayTeamPlayers) {
+            if(player.value === '') {
+                flag = 0;
+                break;
+            }
+        }
+
+        if(!flag) {
+            alert('Please insert away team player names');
+            return;
+        }
+
+        var playerBtns = document.getElementsByClassName('player-btn');
+        var passerBtns = document.getElementsByClassName('passer-btn');
+        var receiverBtns = document.getElementsByClassName('receiver-btn');
+
+        for(let i = 0; i < playerBtns.length; i ++) {
+            playerBtns[i].innerHTML = awayTeamPlayers[i].value;
+            passerBtns[i].innerHTML = awayTeamPlayers[i].value;
+            receiverBtns[i].innerHTML = awayTeamPlayers[i].value;
+        }
+
+        awayTeamPlayerModal.hide();
+    });
+
 }
   
 function exportPinpointCoordinatesToCSV() {
