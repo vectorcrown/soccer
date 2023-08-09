@@ -15,7 +15,7 @@ var pinPointDataEntry = {
     label: '', 
     player: '', 
     receiver: '',
-    frame: 0, 
+    frame: 1, 
     home_team: '', 
     away_team: '',
     date: '',
@@ -33,7 +33,7 @@ function initpinPointDataEntry() {
         label: '', 
         player: '',
         receiver: '', 
-        frame: 0, 
+        frame: 1, 
         home_team: '', 
         away_team: '',
         date: '',
@@ -46,12 +46,14 @@ function initpinPointDataEntry() {
     pinPointDataEntry.date = document.getElementById('date_input').value.trim();
     pinPointDataEntry.team_analyzed = document.getElementById('select_team_input').value.trim();
     pinPointDataEntry.sense_of_attack = document.getElementById('select_sense_attack_input').value.trim();
+    pinPointDataEntry.frame = document.getElementById('frame_input').value.trim();
 }
 
 function checkProfil() {
     var homeTeam = document.getElementById('home_team_input').value.trim();
     var awayTeam = document.getElementById('away_team_input').value.trim();
     var date = document.getElementById('date_input').value.trim();
+    var frame = document.getElementById('frame_input').value.trim();
     var analyzed = document.getElementById('select_team_input').value.trim();
     var senseOfAttack = document.getElementById('select_sense_attack_input').value.trim();
     var flag = 1;
@@ -81,12 +83,12 @@ function checkProfil() {
 }
 
 function showTopContent(contentId) {
-    // if(!checkProfil() && contentId !== 'profil_content') {
-    //     var toast = new bootstrap.Toast(document.getElementById('myToast'));
-    //     document.getElementById('toast_body').innerHTML = 'Please complete your profil';
-    //     toast.show();
-    //     return;
-    // }
+    if(!checkProfil() && contentId !== 'profil_content') {
+        var toast = new bootstrap.Toast(document.getElementById('myToast'));
+        document.getElementById('toast_body').innerHTML = 'Please complete your profil';
+        toast.show();
+        return;
+    }
 
     if(contentId === 'export_content') {
         var deleteRowModal = new bootstrap.Modal(document.getElementById('confirm_modal'));
@@ -353,6 +355,7 @@ function openModals() {
             positionPlayerModal.hide();
             
             pinPointDataEntry.player = playerBtn.innerHTML;
+            pinPointDataEntry.frame = document.getElementById('frame_input').value.trim();
 
             const pinpoint = document.createElement("div");
             if(pinPointDataEntry.label === 'recovery') {
@@ -429,6 +432,7 @@ function openModals() {
             orientationReceiverModal.hide();
             
             pinPointDataEntry.receiver = receiverBtn.innerHTML;
+            pinPointDataEntry.frame = document.getElementById('frame_input').value.trim();
 
             var posX = pinPointDataEntry.x * document.getElementById("orientation_pitch_content").clientWidth / 100;
             var posY = pinPointDataEntry.y * document.getElementById("orientation_pitch_content").clientHeight / 100;
