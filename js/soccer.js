@@ -106,6 +106,7 @@ function showTopContent(contentId) {
             const elems = document.querySelectorAll(`.btn_${deleteNum}`);
             for(const elem of elems) {
                 elem.parentNode.removeChild(elem);
+                deleteRowModal.hide();
             }
         })
     }
