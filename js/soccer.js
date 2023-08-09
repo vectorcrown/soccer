@@ -3,6 +3,8 @@ var isPositionContentSelected = false;
 var isOrientationContentSelected = false;
 var isExportContentSelected = false;
 var isFirstPinPointSelected = false;
+var rowCount = 0;
+var deleteNum = 0;
 
 var pinPointCount = 0;
 var pinPointDataEntry = { 
@@ -39,19 +41,19 @@ function initpinPointDataEntry() {
         sense_of_attack: 'right',
     };
 
-    pinPointDataEntry.home_team = document.getElementById('home_team_input').value;
-    pinPointDataEntry.away_team = document.getElementById('away_team_input').value;
-    pinPointDataEntry.date = document.getElementById('date_input').value;
-    pinPointDataEntry.team_analyzed = document.getElementById('select_team_input').value;
-    pinPointDataEntry.sense_of_attack = document.getElementById('select_sense_attack_input').value;
+    pinPointDataEntry.home_team = document.getElementById('home_team_input').value.trim();
+    pinPointDataEntry.away_team = document.getElementById('away_team_input').value.trim();
+    pinPointDataEntry.date = document.getElementById('date_input').value.trim();
+    pinPointDataEntry.team_analyzed = document.getElementById('select_team_input').value.trim();
+    pinPointDataEntry.sense_of_attack = document.getElementById('select_sense_attack_input').value.trim();
 }
 
 function checkProfil() {
-    var homeTeam = document.getElementById('home_team_input').value;
-    var awayTeam = document.getElementById('away_team_input').value;
-    var date = document.getElementById('date_input').value.value;
-    var analyzed = document.getElementById('select_team_input').value;
-    var senseOfAttack = document.getElementById('select_sense_attack_input').value;
+    var homeTeam = document.getElementById('home_team_input').value.trim();
+    var awayTeam = document.getElementById('away_team_input').value.trim();
+    var date = document.getElementById('date_input').value.trim();
+    var analyzed = document.getElementById('select_team_input').value.trim();
+    var senseOfAttack = document.getElementById('select_sense_attack_input').value.trim();
     var flag = 1;
 
     if(homeTeam === '' || awayTeam === '' || date === '') {
@@ -62,14 +64,14 @@ function checkProfil() {
     var awayTeamPlayers = document.getElementsByClassName('player_name_input2');
 
     for(player of homeTeamPlayers) {
-        if(player.value === '') {
+        if(player.value.trim() === '') {
             flag = 0;
             break;
         }
     }
 
     for(player of awayTeamPlayers) {
-        if(player.value === '') {
+        if(player.value.trim() === '') {
             flag = 0;
             break;
         }
@@ -79,12 +81,31 @@ function checkProfil() {
 }
 
 function showTopContent(contentId) {
-    if(!checkProfil() && contentId !== 'profil_content') {
-        // alert('Please complete your profil');
-        var toast = new bootstrap.Toast(document.getElementById('myToast'));
-        document.getElementById('toast_body').innerHTML = 'Please complete your profil';
-        toast.show();
-        return;
+    // if(!checkProfil() && contentId !== 'profil_content') {
+    //     var toast = new bootstrap.Toast(document.getElementById('myToast'));
+    //     document.getElementById('toast_body').innerHTML = 'Please complete your profil';
+    //     toast.show();
+    //     return;
+    // }
+
+    if(contentId === 'export_content') {
+        var deleteRowModal = new bootstrap.Modal(document.getElementById('confirm_modal'));
+        var deleteRowBtns = document.getElementsByClassName('delete-row-btn');
+
+        for(let btn of deleteRowBtns) {
+            btn.addEventListener('click', function() {
+                deleteRowModal.show();
+                deleteNum = btn.id;
+            });
+        }
+
+        var deleteRow = document.getElementById('delete_row_btn');
+        deleteRow.addEventListener('click', function() {
+            const elems = document.querySelectorAll(`.btn_${deleteNum}`);
+            for(const elem of elems) {
+                elem.parentNode.removeChild(elem);
+            }
+        })
     }
 
     var homeTeamPlayers = document.getElementsByClassName('player_name_input1');
@@ -94,18 +115,17 @@ function showTopContent(contentId) {
     var receiverBtns = document.getElementsByClassName('receiver-btn');
 
     if(contentId === 'position_pitch_content' || contentId === 'orientation_pitch_content') {
-        // debugger;
-        if(document.getElementById('select_team_input').value === 'home') {
+        if(document.getElementById('select_team_input').value.trim() === 'home') {
             for(let i = 0; i < playerBtns.length; i ++) {
-                playerBtns[i].innerHTML = homeTeamPlayers[i].value;
-                passerBtns[i].innerHTML = homeTeamPlayers[i].value;
-                receiverBtns[i].innerHTML = homeTeamPlayers[i].value;
+                playerBtns[i].innerHTML = homeTeamPlayers[i].value.trim();
+                passerBtns[i].innerHTML = homeTeamPlayers[i].value.trim();
+                receiverBtns[i].innerHTML = homeTeamPlayers[i].value.trim();
             }    
         } else {
             for(let i = 0; i < playerBtns.length; i ++) {
-                playerBtns[i].innerHTML = awayTeamPlayers[i].value;
-                passerBtns[i].innerHTML = awayTeamPlayers[i].value;
-                receiverBtns[i].innerHTML = awayTeamPlayers[i].value;
+                playerBtns[i].innerHTML = awayTeamPlayers[i].value.trim();
+                passerBtns[i].innerHTML = awayTeamPlayers[i].value.trim();
+                receiverBtns[i].innerHTML = awayTeamPlayers[i].value.trim();
             }    
         }
     }
@@ -166,9 +186,17 @@ function placePinPointForPosition(event) {
     const pitchHeight = positioniPitchContent.clientHeight;
     const x = scaleCoordinate(event.clientX - positioniPitchContent.offsetLeft, pitchWidth);
     const y = scaleCoordinate(event.clientY - positioniPitchContent.offsetTop, pitchHeight);
+    const sendOfAttack = document.getElementById('select_sense_attack_input').value.trim();
   
-    pinPointDataEntry.x = x;
-    pinPointDataEntry.y = y;
+    if(sendOfAttack === 'right') {
+        pinPointDataEntry.x = x;
+        pinPointDataEntry.y = y;
+    
+    } else {
+        pinPointDataEntry.x = 100 - x;
+        pinPointDataEntry.y = 100 - y;    
+    }
+
     pinPointDataEntry.x1 = 0;
     pinPointDataEntry.y1 = 0;
 }
@@ -179,31 +207,40 @@ function placePinPointForOrientation(event, orientationFirstModal) {
     const pitchHeight = positioniPitchContent.clientHeight;
     const x = scaleCoordinate(event.clientX - positioniPitchContent.offsetLeft, pitchWidth);
     const y = scaleCoordinate(event.clientY - positioniPitchContent.offsetTop, pitchHeight);
+    const sendOfAttack = document.getElementById('select_sense_attack_input').value.trim();
 
     if(isFirstPinPointSelected) {
-        pinPointDataEntry.x1 = x;
-        pinPointDataEntry.y1 = y;
+        if(sendOfAttack === 'right') {
+            pinPointDataEntry.x1 = x;
+            pinPointDataEntry.y1 = y;    
+        } else {
+            pinPointDataEntry.x1 = 100 - x;
+            pinPointDataEntry.y1 = 100 - y;    
+        }
+
         orientationFirstModal.show();
         isFirstPinPointSelected = false;
     } else {
-        pinPointDataEntry.x = x;
-        pinPointDataEntry.y = y;
+        if(sendOfAttack === 'right') {
+            pinPointDataEntry.x = x;
+            pinPointDataEntry.y = y;    
+        } else {
+            pinPointDataEntry.x = 100 - x;
+            pinPointDataEntry.y = 100 - y;    
+        }
+
         isFirstPinPointSelected = true;
     }
 }
 
 function cancelModal() {
-    var modalCancelBtns = document.getElementsByClassName('cancel-modal-btn');
-    for(let modalCancelBtn of modalCancelBtns) {
-        modalCancelBtn.addEventListener('click', function() {
-            initpinPointDataEntry();
-        });
-    }
+
 }
 
 function addRowToExportTable(pinPointDataEntry) {
     var exportTable = document.getElementById('export_table');
     var row = exportTable.insertRow(-1);
+
     var cell0 = row.insertCell(0);
     var cell1 = row.insertCell(1);
     var cell2 = row.insertCell(2);
@@ -217,6 +254,7 @@ function addRowToExportTable(pinPointDataEntry) {
     var cell10 = row.insertCell(10);
     var cell11 = row.insertCell(11);
     var cell12 = row.insertCell(12);
+    var cell13 = row.insertCell(13);
 
     cell0.innerHTML = pinPointDataEntry.x;
     cell1.innerHTML = pinPointDataEntry.y;
@@ -231,6 +269,11 @@ function addRowToExportTable(pinPointDataEntry) {
     cell10.innerHTML = pinPointDataEntry.date;
     cell11.innerHTML = pinPointDataEntry.team_analyzed;
     cell12.innerHTML = pinPointDataEntry.sense_of_attack;
+    cell13.innerHTML = '<button type="button" class="btn-close delete-row-btn" aria-label="Close" id="' + `${rowCount}` + '"></button>';
+
+    row.classList.add(`btn_${rowCount}`);
+
+    rowCount ++;
 }
 
 function drawLine(x, y, x1, y1, type) {
@@ -250,7 +293,7 @@ function drawLine(x, y, x1, y1, type) {
     
     for( var i = 0; i < lineLength; i ++ )
     {
-        bla += "<div style='z-index:0; position:absolute; left:"+ Math.round( x + (x1 - x) * i / lineLength ) +"px;top:"+ Math.round( y + ( y1 - y ) * i / lineLength  ) +"px;width:1px;height:1px;background:" + color + "'></div>";
+        bla += "<div class='" + `btn_${rowCount}` + "' style='z-index:0; position:absolute; left:"+ Math.round( x + (x1 - x) * i / lineLength ) +"px;top:"+ Math.round( y + ( y1 - y ) * i / lineLength  ) +"px;width:1px;height:1px;background:" + color + "'></div>";
     }
     document.getElementById('orientation_pitch_content').innerHTML += bla;
 }
@@ -313,13 +356,13 @@ function openModals() {
 
             const pinpoint = document.createElement("div");
             if(pinPointDataEntry.label === 'recovery') {
-                pinpoint.className = "pinpoint01";
+                pinpoint.className = `pinpoint01 btn_${rowCount}`;
 
             } else if(pinPointDataEntry.label === 'loss') {
-                pinpoint.className = "pinpoint02";
+                pinpoint.className = `pinpoint02 btn_${rowCount}`;
                 
             } else if(pinPointDataEntry.label === 'loss(+3 touches)') {
-                pinpoint.className = "pinpoint03";
+                pinpoint.className = `pinpoint03 btn_${rowCount}`;
             } else {}
 
             pinpoint.setAttribute('title', `${pinPointDataEntry.player}, ${pinPointDataEntry.label}`);
@@ -393,14 +436,14 @@ function openModals() {
             var posY1 = pinPointDataEntry.y1 * document.getElementById("orientation_pitch_content").clientHeight / 100;
 
             const pinpoint1 = document.createElement("div");
-            pinpoint1.className = "pinpoint1";
+            pinpoint1.className = `pinpoint1 btn_${rowCount}`;
             pinpoint1.setAttribute('title', `${pinPointDataEntry.player}, passer, ${pinPointDataEntry.label}`);
             pinpoint1.style.left = ( posX - 5 ) + "px";
             pinpoint1.style.top = ( posY - 5 ) + "px";
             orientationPitchContent.appendChild(pinpoint1);
 
             const pinpoint2 = document.createElement("div");
-            pinpoint2.className = "pinpoint2";
+            pinpoint2.className = `pinpoint2 btn_${rowCount}`;
             pinpoint2.setAttribute('title', `${pinPointDataEntry.player}, receiver, ${pinPointDataEntry.label}`);
             pinpoint2.style.left = ( posX1 - 5 ) + "px";
             pinpoint2.style.top = ( posY1 - 5 ) + "px";
@@ -430,7 +473,7 @@ function openModals() {
 
     var awayTeamPlayers = document.getElementsByClassName('player_name_input2');
     for(player of awayTeamPlayers) {
-        if(player.value === '') {
+        if(player.value.trim() === '') {
             flag = 0;
             break;
         }
@@ -442,32 +485,29 @@ function openModals() {
         var flag = 1;
 
         for(player of homeTeamPlayers) {
-            if(player.value === '') {
+            if(player.value.trim() === '') {
                 flag = 0;
                 break;
             }
         }
 
         if(!flag) {
-            // alert('Please insert home team player names');
             var toast = new bootstrap.Toast(document.getElementById('myToast'));
         document.getElementById('toast_body').innerHTML = 'Please insert home team player names';
 
             toast.show();
             return;
         }
-    
-        // var playerBtns = document.getElementsByClassName('player-btn');
-        // var passerBtns = document.getElementsByClassName('passer-btn');
-        // var receiverBtns = document.getElementsByClassName('receiver-btn');
 
-        // for(let i = 0; i < playerBtns.length; i ++) {
-        //     playerBtns[i].innerHTML = homeTeamPlayers[i].value;
-        //     passerBtns[i].innerHTML = homeTeamPlayers[i].value;
-        //     receiverBtns[i].innerHTML = homeTeamPlayers[i].value;
-        // }
-        
         homeTeamPlayerModal.hide();
+
+        //  cancel modals
+        var modalCancelBtns = document.getElementsByClassName('cancel-modal-btn');
+        for(let modalCancelBtn of modalCancelBtns) {
+            modalCancelBtn.addEventListener('click', function() {
+                initpinPointDataEntry();
+            });
+        }
     });
 
     //  save away team player names
@@ -476,29 +516,18 @@ function openModals() {
         var flag = 1;
 
         for(player of awayTeamPlayers) {
-            if(player.value === '') {
+            if(player.value.trim() === '') {
                 flag = 0;
                 break;
             }
         }
 
         if(!flag) {
-            // alert('Please insert away team player names');
             var toast = new bootstrap.Toast(document.getElementById('myToast'));
             document.getElementById('toast_body').innerHTML = 'Please insert away team player names';
             toast.show();
             return;
         }
-
-        // var playerBtns = document.getElementsByClassName('player-btn');
-        // var passerBtns = document.getElementsByClassName('passer-btn');
-        // var receiverBtns = document.getElementsByClassName('receiver-btn');
-
-        // for(let i = 0; i < playerBtns.length; i ++) {
-        //     playerBtns[i].innerHTML = awayTeamPlayers[i].value;
-        //     passerBtns[i].innerHTML = awayTeamPlayers[i].value;
-        //     receiverBtns[i].innerHTML = awayTeamPlayers[i].value;
-        // }
 
         awayTeamPlayerModal.hide();
     });
@@ -506,35 +535,9 @@ function openModals() {
 }
   
 function exportPinpointCoordinatesToCSV() {
-    const homeTeam = document.getElementById('home_team_input').value;
-    const awayTeam = document.getElementById('away_team_input').value;
-    const date = document.getElementById('date_input').value;
-    const analyzed = document.getElementById('select_team_input').value;
-    const sendOfAttack = document.getElementById('select_sense_attack_input').value;
-
-    for(let i = 0; i < pinPointData.length; i ++) {
-        pinPointData[i].home_team = homeTeam;
-        pinPointData[i].away_team = awayTeam;
-        pinPointData[i].date = date;
-        pinPointData[i].team_analyzed = analyzed;
-        pinPointData[i].sense_of_attack = sendOfAttack;
-    }
-
-    if(sendOfAttack === 'left') {
-        for(let i = 0; i < pinPointData.length; i ++) {
-            pinPointData[i].x = 100 - pinPointData[i].x;
-            pinPointData[i].y = 100 - pinPointData[i].y;
-        }
-    
-    }
-
-    console.log(pinPointData);
-
     const coordinates = pinPointData.map(
         ({ x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack }) => [x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack]
     );
-
-    console.log(coordinates);
 
     let csvContent = "x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack\n";
     for (const [x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack] of coordinates) {
@@ -551,4 +554,3 @@ function exportPinpointCoordinatesToCSV() {
 
 showTopContent('profil_content');
 openModals();
-cancelModal();
