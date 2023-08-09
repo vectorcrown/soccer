@@ -21,6 +21,7 @@ var pinPointDataEntry = {
     date: '',
     team_analyzed: 'home',
     sense_of_attack: 'right',
+    deleted: false
 };
 var pinPointData = [];
 
@@ -39,6 +40,7 @@ function initpinPointDataEntry() {
         date: '',
         team_analyzed: 'home',
         sense_of_attack: 'right',
+        deleted: false
     };
 
     pinPointDataEntry.home_team = document.getElementById('home_team_input').value.trim();
@@ -106,6 +108,7 @@ function showTopContent(contentId) {
             const elems = document.querySelectorAll(`.btn_${deleteNum}`);
             for(const elem of elems) {
                 elem.parentNode.removeChild(elem);
+                pinPointData[deleteNum].deleted = true;
                 deleteRowModal.hide();
             }
         })
@@ -541,12 +544,14 @@ function openModals() {
   
 function exportPinpointCoordinatesToCSV() {
     const coordinates = pinPointData.map(
-        ({ x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack }) => [x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack]
+        ({ x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack, deleted }) => [x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack, deleted]
     );
 
     let csvContent = "x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack\n";
-    for (const [x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack] of coordinates) {
-        csvContent += `${x},${y},${x1},${y1}, ${label}, ${player}, ${receiver}, ${frame}, ${home_team}, ${away_team}, ${date}, ${team_analyzed}, ${sense_of_attack} \n`;
+    for (const [x, y, x1, y1, label, player, receiver, frame, home_team, away_team, date, team_analyzed, sense_of_attack, deleted] of coordinates) {
+        if(!deleted) {
+            csvContent += `${x},${y},${x1},${y1}, ${label}, ${player}, ${receiver}, ${frame}, ${home_team}, ${away_team}, ${date}, ${team_analyzed}, ${sense_of_attack} \n`;
+        }
     }
   
     const blob = new Blob([csvContent], { type: "text/csv" });
