@@ -422,10 +422,42 @@ function openModals() {
 
     for(let passerBtn of passerBtns) {
         passerBtn.addEventListener('click', function() {
-            orientationPasserModal.hide();
-            orientationReceiverModal.show();
-
             pinPointDataEntry.player = passerBtn.innerHTML;
+            if(pinPointDataEntry.label === 'progress' || pinPointDataEntry.label === 'call') {
+                orientationPasserModal.hide();
+
+                // pinPointDataEntry.receiver = receiverBtn.innerHTML;
+                pinPointDataEntry.frame = document.getElementById('frame_input').value.trim();
+    
+                var posX = pinPointDataEntry.x * document.getElementById("orientation_pitch_content").clientWidth / 100;
+                var posY = pinPointDataEntry.y * document.getElementById("orientation_pitch_content").clientHeight / 100;
+                var posX1 = pinPointDataEntry.x1 * document.getElementById("orientation_pitch_content").clientWidth / 100;
+                var posY1 = pinPointDataEntry.y1 * document.getElementById("orientation_pitch_content").clientHeight / 100;
+    
+                const pinpoint1 = document.createElement("div");
+                pinpoint1.className = `pinpoint1 btn_${rowCount}`;
+                pinpoint1.setAttribute('title', `${pinPointDataEntry.player}, player, ${pinPointDataEntry.label}`);
+                pinpoint1.style.left = ( posX - 5 ) + "px";
+                pinpoint1.style.top = ( posY - 5 ) + "px";
+                orientationPitchContent.appendChild(pinpoint1);
+    
+                const pinpoint2 = document.createElement("div");
+                pinpoint2.className = `pinpoint2 btn_${rowCount}`;
+                pinpoint2.setAttribute('title', `${pinPointDataEntry.player}, player, ${pinPointDataEntry.label}`);
+                pinpoint2.style.left = ( posX1 - 5 ) + "px";
+                pinpoint2.style.top = ( posY1 - 5 ) + "px";
+                orientationPitchContent.appendChild(pinpoint2);
+    
+                drawLine(posX, posY, posX1, posY1, pinPointDataEntry.label);
+                pinPointData.push(pinPointDataEntry);
+    
+                addRowToExportTable(pinPointDataEntry);
+                initpinPointDataEntry();
+            } else {
+                orientationPasserModal.hide();
+                orientationReceiverModal.show();    
+            }
+
         });
     }
 

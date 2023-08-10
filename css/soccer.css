@@ -22,6 +22,22 @@
     position: absolute;
 }
 
+.pinpoint04 {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.pinpoint05 {
+    width: 10px;
+    height: 10px;
+    background-color: yellow;
+    border-radius: 50%;
+    position: absolute;
+}
+
 .pinpoint1 {
     width: 10px;
     height: 10px;
