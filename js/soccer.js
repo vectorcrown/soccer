@@ -392,6 +392,7 @@ function openModals() {
 
     successPassBtn.addEventListener('click', function() {
         orientationFirstModal.hide();
+        document.getElementById('orientation_player_modal_body').innerHTML = 'PASSERS(ORIENTATION)';
         orientationPasserModal.show();
 
         pinPointDataEntry.label = 'success pass';
@@ -399,6 +400,7 @@ function openModals() {
 
     failedPassBtn.addEventListener('click', function() {
         orientationFirstModal.hide();
+        document.getElementById('orientation_player_modal_body').innerHTML = 'PASSERS(ORIENTATION)';
         orientationPasserModal.show();
 
         pinPointDataEntry.label = 'failed pass';
@@ -406,6 +408,7 @@ function openModals() {
 
     progressBtn.addEventListener('click', function() {
         orientationFirstModal.hide();
+        document.getElementById('orientation_player_modal_body').innerHTML = 'PLAYERS(ORIENTATION)';
         orientationPasserModal.show();
 
         pinPointDataEntry.label = 'progress';
@@ -413,6 +416,7 @@ function openModals() {
 
     callBtn.addEventListener('click', function() {
         orientationFirstModal.hide();
+        document.getElementById('orientation_player_modal_body').innerHTML = 'PLAYERS(ORIENTATION)';
         orientationPasserModal.show();
 
         pinPointDataEntry.label = 'call';
@@ -455,6 +459,7 @@ function openModals() {
                 initpinPointDataEntry();
             } else {
                 orientationPasserModal.hide();
+                document.getElementById('orientation_player_modal_body').innerHTML = 'PASSERS(ORIENTATION)';
                 orientationReceiverModal.show();    
             }
 
